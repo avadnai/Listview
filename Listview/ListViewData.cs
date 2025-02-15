@@ -52,6 +52,14 @@ namespace Listview
 
         public ItemsForListView()
         {
+
+            // Initialize non-nullable fields
+            id = string.Empty;
+            CreationTime = string.Empty;
+            DeltaTime = string.Empty;
+            level2Items = new ObservableCollection<string>();
+            PropertyChanged = delegate { };
+
             var random = new Random();
             int length = random.Next(10, 21); // Random length between 10 and 20
             const string chars = "ABCDEF0123456789";
@@ -59,7 +67,10 @@ namespace Listview
                 .Select(s => s[random.Next(s.Length)]).ToArray());
 
             SecondLevelItems.Add(randomText);
+
+
         }
+
 
         public string this[string columnName]
         {
@@ -72,13 +83,13 @@ namespace Listview
                         return "ID must be exactly 3 characters long and contain only 0123456789ABCDEF.";
                     }
                 }
-                return null;
+                return string.Empty; // Return an empty string instead of null
             }
         }
 
-        public string Error => null;
+        public string Error => string.Empty; // Return an empty string instead of null
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged(string propertyName)
         {

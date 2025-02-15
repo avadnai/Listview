@@ -2,6 +2,7 @@
 using System.Windows.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 
 namespace Listview
@@ -16,6 +17,7 @@ namespace Listview
         private ConcurrentQueue<ItemsForListView> itemsBuffer;
         private bool autoScroll = true;
         private int updateCounter = 0;
+        private CollectionViewSource collectionViewSource;
 
         public MainWindow()
         {
@@ -34,7 +36,7 @@ namespace Listview
 
             // Set up the timer
             timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(20); // Update UI every 20 milliseconds
+            timer.Interval = TimeSpan.FromMilliseconds(20); // Update UI every 50 milliseconds
             timer.Tick += Timer_Tick;
             timer.Start();
 
@@ -54,6 +56,11 @@ namespace Listview
                     listView.ScrollIntoView(listView.Items[listView.Items.Count - 1]);
                 }
             }), DispatcherPriority.Loaded);
+
+            // Set up CollectionViewSource for filtering
+            collectionViewSource = new CollectionViewSource { Source = dataItems };
+            collectionViewSource.Filter += CollectionViewSource_Filter;
+            listView.ItemsSource = collectionViewSource.View;
         }
 
         private void Timer_Tick(object? sender, EventArgs e)
@@ -98,7 +105,6 @@ namespace Listview
             }
         }
 
-
         private void ListView_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             // Disable auto-scroll if the user scrolls manually
@@ -119,7 +125,18 @@ namespace Listview
                     }
                 }
             }
+
+            // Use autoScroll to scroll to the bottom if enabled
+            if (autoScroll && e.ExtentHeightChange != 0)
+            {
+                if (listView.Items.Count > 0)
+                {
+                    listView.ScrollIntoView(listView.Items[listView.Items.Count - 1]);
+                }
+            }
         }
+
+
 
         private void AddItemsInBackground()
         {
@@ -162,10 +179,35 @@ namespace Listview
             }
         }
 
-
         private void UpdateStatusBar()
         {
             statusBarItem.Content = $"Anzahl der Elemente: {itemCount}";
+        }
+
+        private void FilterButton_Click(object sender, RoutedEventArgs e)
+        {
+            collectionViewSource.View.Refresh();
+        }
+
+        private void ClearFilterButton_Click(object sender, RoutedEventArgs e)
+        {
+            filterTextBox.Text = string.Empty;
+            collectionViewSource.View.Refresh();
+        }
+
+        private void CollectionViewSource_Filter(object sender, FilterEventArgs e)
+        {
+            if (e.Item is ItemsForListView item)
+            {
+                if (string.IsNullOrEmpty(filterTextBox.Text) || item.Id.Contains(filterTextBox.Text, StringComparison.OrdinalIgnoreCase))
+                {
+                    e.Accepted = true;
+                }
+                else
+                {
+                    e.Accepted = false;
+                }
+            }
         }
     }
 }

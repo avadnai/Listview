@@ -4,22 +4,56 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Listview"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="MainWindow" Height="1000" Width="1200">
     <Window.Resources>
         <local:ListViewData x:Key="dataItems"/>
+        <Style x:Key="PlaceholderTextBox" TargetType="TextBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Grid>
+                            <TextBox x:Name="textBox" Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock x:Name="placeholder" Text="Filter by ID" Foreground="Gray" Margin="5,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" Visibility="Collapsed" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Text" Value="">
+                                <Setter TargetName="placeholder" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                            <Trigger Property="Text" Value="{x:Null}">
+                                <Setter TargetName="placeholder" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                            <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                                <Setter TargetName="placeholder" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                            <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                                <Setter TargetName="placeholder" Property="Visibility" Value="Collapsed" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="5">
+            <TextBox x:Name="filterTextBox" Width="200" Margin="5" Style="{StaticResource PlaceholderTextBox}"/>
+            <Button Content="Filter" Click="FilterButton_Click" Margin="5"/>
+            <Button Content="Clear Filter" Click="ClearFilterButton_Click" Margin="5"/>
+        </StackPanel>
         <ListView x:Name="listView" 
                   ItemsSource="{Binding Source={StaticResource dataItems}}"
                   VirtualizingStackPanel.IsVirtualizing="True"
                   VirtualizingStackPanel.VirtualizationMode="Recycling"
                   ScrollViewer.VerticalScrollBarVisibility="Auto"
-                  Grid.Row="0">
+                  Grid.Row="1">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Time" DisplayMemberBinding="{Binding CreationTime}" />
@@ -29,7 +63,7 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <StatusBar Grid.Row="1">
+        <StatusBar Grid.Row="2">
             <StatusBarItem x:Name="statusBarItem" Content="Anzahl der Elemente: 0" />
         </StatusBar>
     </Grid>
