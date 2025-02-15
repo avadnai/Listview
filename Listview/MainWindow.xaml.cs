@@ -113,6 +113,9 @@ namespace Listview
 
         private void AddItemsInBackground()
         {
+            var random = new Random();
+            const string chars = "0123456789ABCDEF";
+
             while (true)
             {
                 // Berechne die verstrichene Zeit in Sekunden
@@ -122,10 +125,11 @@ namespace Listview
                 double deltaTime = (DateTime.Now - lastItemTime).TotalMilliseconds;
                 lastItemTime = DateTime.Now;
 
-                // Erstelle ein neues Item
+                // Erstelle ein neues Item mit zufälligem drei Zeichen langem String
                 var newItem = new ItemsForListView
                 {
-                    TopLevelName = "item " + itemCount.ToString(),
+                    Id = new string(Enumerable.Repeat(chars, 3)
+                        .Select(s => s[random.Next(s.Length)]).ToArray()),
                     CreationTime = elapsedSeconds.ToString("F3"), // Format mit drei Dezimalstellen
                     DeltaTime = deltaTime.ToString("F2") // Format mit zwei Dezimalstellen
                 };

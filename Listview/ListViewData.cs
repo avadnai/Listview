@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 
 namespace Listview
@@ -12,9 +13,22 @@ namespace Listview
         }
     }
 
-    public class ItemsForListView
+    public class ItemsForListView : INotifyPropertyChanged, IDataErrorInfo
     {
-        public string TopLevelName { get; set; }
+        private string id;
+        public string Id
+        {
+            get => id;
+            set
+            {
+                if (id != value)
+                {
+                    id = value;
+                    OnPropertyChanged(nameof(Id));
+                }
+            }
+        }
+
         public string CreationTime { get; set; }
         public string DeltaTime { get; set; }
         private ObservableCollection<string> level2Items;
@@ -46,5 +60,30 @@ namespace Listview
 
             SecondLevelItems.Add(randomText);
         }
+
+        public string this[string columnName]
+        {
+            get
+            {
+                if (columnName == nameof(Id))
+                {
+                    if (string.IsNullOrEmpty(Id) || Id.Length != 3 || !Id.All(c => "0123456789ABCDEF".Contains(c)))
+                    {
+                        return "ID must be exactly 3 characters long and contain only 0123456789ABCDEF.";
+                    }
+                }
+                return null;
+            }
+        }
+
+        public string Error => null;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }
+

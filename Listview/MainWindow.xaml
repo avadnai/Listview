@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Listview"
         mc:Ignorable="d"
-        Title="MainWindow" Height="430" Width="800">
+        Title="MainWindow" Height="1000" Width="1200">
     <Window.Resources>
         <local:ListViewData x:Key="dataItems"/>
     </Window.Resources>
@@ -19,10 +19,11 @@
                 <GridView>
                     <GridViewColumn Header="Time" DisplayMemberBinding="{Binding CreationTime}" />
                     <GridViewColumn Header="Delta t (ms)" DisplayMemberBinding="{Binding DeltaTime}" />
-                    <GridViewColumn Header="Top Level Name" DisplayMemberBinding="{Binding TopLevelName}" />
+                    <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Id}" />
                     <GridViewColumn Header="Second Level Items" DisplayMemberBinding="{Binding SecondLevelItemsString}" />
                 </GridView>
             </ListView.View>
         </ListView>
     </Grid>
 </Window>
+
