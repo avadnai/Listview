@@ -15,6 +15,7 @@ namespace Listview
         private DateTime lastItemTime;
         private ConcurrentQueue<ItemsForListView> itemsBuffer;
         private bool autoScroll = true;
+        private int updateCounter = 0;
 
         public MainWindow()
         {
@@ -79,18 +80,24 @@ namespace Listview
                     while (itemsBuffer.TryDequeue(out var item))
                     {
                         dataItems.Add(item);
+                        updateCounter++;
+
+                        // Update the status bar with the current item count every 1000 items
+                        if (updateCounter >= 1000)
+                        {
+                            UpdateStatusBar();
+                            updateCounter = 0;
+                        }
                     }
 
                     if (isAtBottom && dataItems.Count > 0)
                     {
                         listView.ScrollIntoView(dataItems[dataItems.Count - 1]);
                     }
-
-                    // Update the status bar with the current item count
-                    UpdateStatusBar();
                 }), DispatcherPriority.Background);
             }
         }
+
 
         private void ListView_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
@@ -155,9 +162,11 @@ namespace Listview
             }
         }
 
+
         private void UpdateStatusBar()
         {
             statusBarItem.Content = $"Anzahl der Elemente: {itemCount}";
         }
     }
 }
+
