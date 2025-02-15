@@ -10,11 +10,16 @@
         <local:ListViewData x:Key="dataItems"/>
     </Window.Resources>
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         <ListView x:Name="listView" 
                   ItemsSource="{Binding Source={StaticResource dataItems}}"
                   VirtualizingStackPanel.IsVirtualizing="True"
                   VirtualizingStackPanel.VirtualizationMode="Recycling"
-                  ScrollViewer.VerticalScrollBarVisibility="Auto">
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  Grid.Row="0">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Time" DisplayMemberBinding="{Binding CreationTime}" />
@@ -24,6 +29,8 @@
                 </GridView>
             </ListView.View>
         </ListView>
+        <StatusBar Grid.Row="1">
+            <StatusBarItem x:Name="statusBarItem" Content="Anzahl der Elemente: 0" />
+        </StatusBar>
     </Grid>
 </Window>
-

@@ -85,6 +85,9 @@ namespace Listview
                     {
                         listView.ScrollIntoView(dataItems[dataItems.Count - 1]);
                     }
+
+                    // Update the status bar with the current item count
+                    UpdateStatusBar();
                 }), DispatcherPriority.Background);
             }
         }
@@ -115,34 +118,46 @@ namespace Listview
         {
             var random = new Random();
             const string chars = "0123456789ABCDEF";
+            var stopwatch = new System.Diagnostics.Stopwatch();
 
             while (true)
             {
-                // Berechne die verstrichene Zeit in Sekunden
-                double elapsedSeconds = (DateTime.Now - startTime).TotalSeconds;
-
-                // Berechne die Delta-Zeit in Millisekunden
-                double deltaTime = (DateTime.Now - lastItemTime).TotalMilliseconds;
-                lastItemTime = DateTime.Now;
-
-                // Erstelle ein neues Item mit zufälligem drei Zeichen langem String
-                var newItem = new ItemsForListView
+                for (int i = 0; i < 100; i++)
                 {
-                    Id = new string(Enumerable.Repeat(chars, 3)
-                        .Select(s => s[random.Next(s.Length)]).ToArray()),
-                    CreationTime = elapsedSeconds.ToString("F3"), // Format mit drei Dezimalstellen
-                    DeltaTime = deltaTime.ToString("F2") // Format mit zwei Dezimalstellen
-                };
+                    // Berechne die verstrichene Zeit in Sekunden
+                    double elapsedSeconds = (DateTime.Now - startTime).TotalSeconds;
 
-                // Füge das neue Item zum Puffer hinzu
-                itemsBuffer.Enqueue(newItem);
+                    // Berechne die Delta-Zeit in Millisekunden
+                    double deltaTime = (DateTime.Now - lastItemTime).TotalMilliseconds;
+                    lastItemTime = DateTime.Now;
 
-                itemCount++;
+                    // Erstelle ein neues Item mit zufälligem drei Zeichen langem String
+                    var newItem = new ItemsForListView
+                    {
+                        Id = new string(Enumerable.Repeat(chars, 3)
+                            .Select(s => s[random.Next(s.Length)]).ToArray()),
+                        CreationTime = elapsedSeconds.ToString("F3"), // Format mit drei Dezimalstellen
+                        DeltaTime = deltaTime.ToString("F2") // Format mit zwei Dezimalstellen
+                    };
 
-                // Schlafe für 5 Millisekunden, um die Frequenz des Hinzufügens neuer Items zu erhöhen
-                Thread.Sleep(5);
+                    // Füge das neue Item zum Puffer hinzu
+                    itemsBuffer.Enqueue(newItem);
+
+                    itemCount++;
+
+                    // Schlafe für 1 Millisekunde, um die Frequenz des Hinzufügens neuer Items zu erhöhen
+                    stopwatch.Restart();
+                    while (stopwatch.ElapsedMilliseconds < 1)
+                    {
+                        // Busy-wait loop to achieve more accurate timing
+                    }
+                }
             }
+        }
+
+        private void UpdateStatusBar()
+        {
+            statusBarItem.Content = $"Anzahl der Elemente: {itemCount}";
         }
     }
 }
-
